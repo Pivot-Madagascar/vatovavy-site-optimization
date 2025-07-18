@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+osrm/*
+#large spatial files
+data/nsv/*
+data/mnj/*
