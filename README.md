@@ -29,7 +29,7 @@ lapply(c("sf", "terra", "dplyr", "osrm", "tidyr), install.packages)
 
 ## OSRM Backend
 
-We use the osrm-backend found here: https://github.com/Project-OSRM/osrm-backend. Following recommendations, we use the docker version. To set up the backend server, place the `pdf` file of OSM data into a directory. In the example below, the directory is called `osrm`. Then run the following code to extract and create the routing files needed. This only needs to be done one time.
+We use the osrm-backend found here: https://github.com/Project-OSRM/osrm-backend. Following recommendations, we use the docker version. To set up the backend server, place the `pdf` file of OSM data into a directory called `osrm`. In the example below, the file is called `osm_mapping_pivot.pbf`. Then run the following code to extract and create the routing files needed. This only needs to be done one time.
 
 ```
 #start docker from osrm directory
@@ -49,6 +49,10 @@ docker run -t -i -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --
 
 This shoudl return the IP address and port for hte server, which you will need to configure the `osrm.server` in your R scrip. Usually the default is one of `localhost:5000`, `0.0.0.0:5000`, or `127.0.0.1:5000`.
 
+## Extract spatial data
+
+The other supporting is contained in two compressed files: `data/mnj.tar.gz` and `data/nsv.tar.gz`. Unzip these files into `data/mnj` and `data/nsv` respsectively. These are uploaded compressed due to github LSF restrictions.
+
 
 ## Run the analysis
 
@@ -56,15 +60,16 @@ After starting the OSRM backend server (see above), you can run the R scripts in
 
 - `catchment.gpkg`: A geopackage of the catchment polygons that are serving as a proxy for fokontany
 - `res_centroid.gpkg`: A geopackage containing the centroid of each residential area with more than 4 buildings, including the number of buildings and fokontany
-- `optimal_sites.gpkg`: A geopacakge and csv file of the optimal community health sites by catchment 
+- `optimal_sites.gpkg`: A geopackage and csv file of the optimal community health sites by catchment 
 
+The optimal sites files contain what you will need for the Shiny application. Each row corresponds to a potential site. The columns are:
 
-## Notes for Michelle
-
-This is what we have to do for each 
-
-- create voronoi polygons (catchment) and save. These will be based aroudn the chef lieu of each fokontany
-- create points for residential zones with number of buildings for weighting (centroid of zone)
-- use OSRM to get distance between each residential zone within each catchment ( may need to do by catchment rather than all at once becuase it is super slow)
-- rank them based on which is on average closest to everyone else
-- return a ranked list
+| variable      | description                                                                                                                                              |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| full_id       | ID of residential zone from OSM                                                                                                                          |
+| comm_fkt      | the name of the commune and fokontany, seperated by `_`                                                                                                  |
+| dist_wt       | the average distance (in m) between each household and the potential site                                                                                |
+| distance_rank | the ranking of that site within the fokontany according to its average distance (1 = closest to households, 5 = furthest)                                |
+| lat           | the latitude of the residential zone corresponding to the potential site                                                                                 |
+| lon           | the longitude of the residential zone corresponding to the potential site                                                                                |
+| num_buildings | the number of buildings within that residential zone. This should be used in combination with the distance to identify the best site for that fokontany. |
