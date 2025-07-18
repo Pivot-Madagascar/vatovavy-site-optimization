@@ -14,10 +14,8 @@ For each district, it:
 ## Requirements
 
 - R > v. 4.4
-- docker
+- `docker`
 
-Recommends using docker verson of OSRM now: https://github.com/Project-OSRM/osrm-backend
-will need to figure out how to to install. Have checked that this works with the R package, so should be okay
 
 ## R Packages
 
@@ -29,7 +27,7 @@ lapply(c("sf", "terra", "dplyr", "osrm", "tidyr), install.packages)
 
 ## OSRM Backend
 
-We use the osrm-backend found here: https://github.com/Project-OSRM/osrm-backend. Following recommendations, we use the docker version. To set up the backend server, place the `pdf` file of OSM data into a directory called `osrm`. In the example below, the file is called `osm_mapping_pivot.pbf`. Then run the following code to extract and create the routing files needed. This only needs to be done one time.
+We use the osrm-backend found here: https://github.com/Project-OSRM/osrm-backend. Following recommendations, we use the docker version. To set up the backend server, place the `pbf` file of OSM data into a directory called `osrm`. In the example below, the file is called `osm_mapping_pivot.pbf`. Then run the following code to extract and create the routing files needed. This only needs to be done one time.
 
 ```
 #start docker from osrm directory
@@ -47,16 +45,16 @@ Once the files have been extracted, you can use the following script to start up
 docker run -t -i -p 5000:5000 -v "${PWD}:/data" osrm/osrm-backend osrm-routed --algorithm mld --max-table-size 10000 /data/osm_mapping_pivot.osrm 
 ```
 
-This shoudl return the IP address and port for hte server, which you will need to configure the `osrm.server` in your R scrip. Usually the default is one of `localhost:5000`, `0.0.0.0:5000`, or `127.0.0.1:5000`.
+This should return the IP address and port for the server, which you will need to configure the `osrm.server` in your R script `03`. Usually the default is one of `localhost:5000`, `0.0.0.0:5000`, or `127.0.0.1:5000`.
 
 ## Extract spatial data
 
-The other supporting is contained in two compressed files: `data/mnj.tar.gz` and `data/nsv.tar.gz`. Unzip these files into `data/mnj` and `data/nsv` respsectively. These are uploaded compressed due to github LSF restrictions.
+The other supporting spatial data is contained in two compressed files: `data/mnj.tar.gz` and `data/nsv.tar.gz`. Unzip these files into `data/mnj` and `data/nsv` respsectively. These are uploaded compressed due to github LSF restrictions.
 
 
 ## Run the analysis
 
-After starting the OSRM backend server (see above), you can run the R scripts in order for each district. It will create three files for each district, saved in teh `output` folder:
+After starting the OSRM backend server (see above), you can run the R scripts in order for each district. It will create three files for each district, saved in the `output` folder:
 
 - `catchment.gpkg`: A geopackage of the catchment polygons that are serving as a proxy for fokontany
 - `res_centroid.gpkg`: A geopackage containing the centroid of each residential area with more than 4 buildings, including the number of buildings and fokontany
